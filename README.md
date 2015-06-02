@@ -11,7 +11,7 @@ Log will be in logs/run.log with the above command
 
  * ansible-playbook -vvvv -i hosts/servers.ini -D playbooks/knocks.yml 2>&1 |tee logs/debug.log
  
- Look for an output recap similar to:
+ Look for an output recap similar to the below, analyze faileds and unreachables
  
  ```bash
      PLAY RECAP ********************************************************************
