@@ -4,8 +4,7 @@
 # CPR : Jd Daniel :: Ehime-ken
 # MOD : 2015-06-02 @ 13:03:10
 
-# INP : $ python deploy.py develop 2dd34f62eee0a309fb3e61e3f333a4329a648010
-# INP : # $ python deploy.py /EngradeAppPath develop 2dd34f62eee0a309fb3e61e3f333a4329a648010
+# INP : $ python deploy.py /DeployPath develop {{key}}
 
 
 import json
@@ -25,11 +24,11 @@ import requests             ## requires: pip install requests
 
 # Cheating here, this makes things look good but it's meh
 arg_parser = argparse.ArgumentParser(description="Quick and Dirty deployer, emphasis on dirty")
-# arg_parser.add_argument('path', help="Path you will be unloading to")
+arg_parser.add_argument('path', help="Path you will be unloading to")
 arg_parser.add_argument('branch', help="Branch of the repo you want to maintain")
 arg_parser.add_argument('token', help="Token of the Github account to check out from")
-arg_parser.add_argument('--organization', default="engrade", help="Name of the organization that holds the repo")
-arg_parser.add_argument('--repo', default='Engrade', help="Name of the repo")
+arg_parser.add_argument('--organization', default="Ehimeprefecture", help="Name of the organization that holds the repo")
+arg_parser.add_argument('--repo', default='Ehimeprefecture', help="Name of the repo")
 arg_parser.add_argument('--no-composer', action='store_false', dest='composer', help="Skip Composer Run")
 arg_parser.add_argument('--temp-dir', help="Overwrite the default temp dir", default=tempfile.gettempdir())
 arg_parser.add_argument('--owner', help="Default owner of the target directory", default="apache")
@@ -38,9 +37,7 @@ arg_parser.add_argument('--verbose', '-v', help="Increase Verbosity", action="co
 arg_parser.add_argument('--force', help="Force a deploy", action="store_true")
 args = arg_parser.parse_args()
 
-# track_file = os.path.join(path, 'deploy_hash_'+args.branch)
-track_file = os.path.join('/local/apps/engradepro/engradeapp', 'deploy_hash_'+args.branch)
-
+track_file = os.path.join(path, 'deploy_hash_'+args.branch)
 #temp_dir = '/tmp'
 
 composer = True
@@ -56,7 +53,7 @@ else:
 
 
 def get_file_handle(track_file, write=False):
-    #Check if file exists, if it does open it, if not try to create it, if that fails, scream bloody murder
+    # Check if file exists, if it does open it, if not try to create it, if that fails, scream bloody murder
     mode = 'r'
     if write:
         mode = 'w'
@@ -85,7 +82,7 @@ def write_local_hash(fh, object, new_hash):
     if object['current']:
         object['previous'].append(object['current'])
     object['current'] = new_hash
-    #injecting some cleanup logic here
+    # Injecting some cleanup logic here
     while len(object['previous']) > 5:
         delHash = object['previous'].pop(0)
         shutil.rmtree(os.path.join(args.local_checkout, delHash))
@@ -95,15 +92,15 @@ def write_local_hash(fh, object, new_hash):
 fh = get_file_handle(track_file)
 lh = get_local_hash(fh)
 
-#Get Connected
+# Get Connected
 gh = Github(args.token)
 repo = gh.get_organization(args.organization).get_repo(args.repo)
 
-#Get Commit
+# Get Commit
 commit = repo.get_branch(args.branch).commit
 ch = commit.sha
 
-#most common, current and ref matches
+# Most common, current and ref matches
 if lh and 'current' in lh.keys() and lh['current'] == ch and not args.force:
     log.info("Deploy current")
     exit(0)
@@ -131,17 +128,14 @@ except:
 print 'Deploying SHA: ',commit.sha
 
 # move stuff around
-# target = os.path.join(path+'/jobs/', commit.sha)
-target = os.path.join('/local/apps/engradepro/engradeapp/jobs/', commit.sha)
+target = os.path.join(path+'/jobs/', commit.sha)
 
-api_target = os.path.join(target, 'engradeapi/w/')
+api_target = os.path.join(target, 'theApi/w/')
 
-# sym_target = path+'/current'
-sym_target = '/local/apps/engradepro/engradeapp/current'
+sym_target = path+'/current'
 
 if os.path.islink(sym_link):
-#    path = os.readlink(path+'/current')
-    path = os.readlink('/local/apps/engradepro/engradeapp/current')
+    path = os.readlink(path+'/current')
     print path
 
 #run composer
