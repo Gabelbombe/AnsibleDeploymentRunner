@@ -3,8 +3,9 @@
   remote_user: root
   sudo: yes
   vars:
-     env: develop
-     key: 2dd34f62eee0a309fb3e61e3f333a4329a648010
+     dir: /tmp/deploy 
+     env: master
+     key: {{git key}}
   tasks:
   - name: Install pip package from yum
     yum: name={{ item }} state=present update_cache=true
@@ -26,4 +27,4 @@
     copy: src=scripts/deploy.py dest=/tmp/deploy.py owner=root group=root mode=700 backup=no
 
   - name: Execute the script
-    command: python /tmp/deploy.py {{env}} {{key}}
+    command: python /tmp/deploy.py {{dir}} {{env}} {{key}}
