@@ -1,22 +1,31 @@
 #!/usr/bin/env python
-# python deploy.py develop 2dd34f62eee0a309fb3e61e3f333a4329a648010
+# Deploy latest from {{BRANCH}} to an environment
+
+# CPR : Jd Daniel :: Ehime-ken
+# MOD : 2015-06-02 @ 13:03:10
+
+# INP : $ python deploy.py develop 2dd34f62eee0a309fb3e61e3f333a4329a648010
+# INP : # $ python deploy.py /EngradeAppPath develop 2dd34f62eee0a309fb3e61e3f333a4329a648010
+
+
 import json
 import os
 import tarfile
 import shutil
-import argparse             ## pip install argparse
+import argparse             ## requires: pip install argparse
 import subprocess
 import tempfile
 import pwd
 import grp
 import logging
 
-from github import Github   ## pip install pygithub
-import requests             ## pip install requests
+from github import Github   ## requires: pip install pygithub
+import requests             ## requires: pip install requests
 
 
 # Cheating here, this makes things look good but it's meh
 arg_parser = argparse.ArgumentParser(description="Quick and Dirty deployer, emphasis on dirty")
+# arg_parser.add_argument('path', help="Path you will be unloading to")
 arg_parser.add_argument('branch', help="Branch of the repo you want to maintain")
 arg_parser.add_argument('token', help="Token of the Github account to check out from")
 arg_parser.add_argument('--organization', default="engrade", help="Name of the organization that holds the repo")
@@ -29,7 +38,9 @@ arg_parser.add_argument('--verbose', '-v', help="Increase Verbosity", action="co
 arg_parser.add_argument('--force', help="Force a deploy", action="store_true")
 args = arg_parser.parse_args()
 
+# track_file = os.path.join(path, 'deploy_hash_'+args.branch)
 track_file = os.path.join('/local/apps/engradepro/engradeapp', 'deploy_hash_'+args.branch)
+
 #temp_dir = '/tmp'
 
 composer = True
@@ -119,12 +130,17 @@ except:
 
 print 'Deploying SHA: ',commit.sha
 
-#move stuff around
+# move stuff around
+# target = os.path.join(path+'/jobs/', commit.sha)
 target = os.path.join('/local/apps/engradepro/engradeapp/jobs/', commit.sha)
+
 api_target = os.path.join(target, 'engradeapi/w/')
+
+# sym_target = path+'/current'
 sym_target = '/local/apps/engradepro/engradeapp/current'
 
 if os.path.islink(sym_link):
+#    path = os.readlink(path+'/current')
     path = os.readlink('/local/apps/engradepro/engradeapp/current')
     print path
 
