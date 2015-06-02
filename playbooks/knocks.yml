@@ -1,0 +1,5 @@
+- hosts: all
+  gather_facts: False
+  sudo: yes
+  tasks:
+  - shell: whoami
